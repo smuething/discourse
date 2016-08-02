@@ -1341,6 +1341,7 @@ en:
     default_email_mailing_list_mode_frequency: "Users who enable mailing list mode will receive emails this often by default."
     disable_mailing_list_mode: "Disallow users from enabling mailing list mode."
     default_email_always: "Send an email notification even when the user is active by default."
+    default_email_for_own_posts: "Send an email notification for the user's own posts (good for emulating mailing list behavior)."
     default_email_previous_replies: "Include previous replies in emails by default."
 
     default_email_in_reply_to: "Include excerpt of replied to post in emails by default."

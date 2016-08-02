@@ -709,6 +709,7 @@ en:
       include_tl0_in_digests: "Include content from new users in summary emails"
       email_in_reply_to: "Include an excerpt of replied to post in emails"
       email_direct: "Send me an email when someone quotes me, replies to my post, mentions my @username, or invites me to a topic"
+      email_for_own_posts: "Send me an email for the posts that I create myself"
       email_private_messages: "Send me an email when someone messages me"
       email_always: "Send me email notifications even when I am active on the site"
 

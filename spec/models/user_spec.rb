@@ -1217,6 +1217,7 @@ describe User do
       SiteSetting.default_email_direct = false
       SiteSetting.default_email_mailing_list_mode = true
       SiteSetting.default_email_always = true
+      SiteSetting.default_email_for_own_posts = true
 
       SiteSetting.default_other_new_topic_duration_minutes = -1 # not viewed
       SiteSetting.default_other_auto_track_topics_after_msecs = 0 # immediately

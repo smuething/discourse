@@ -20,6 +20,7 @@ class UserUpdater
     :mailing_list_mode_frequency,
     :email_digests,
     :email_direct,
+    :email_for_own_posts,
     :email_private_messages,
     :external_links_in_new_tab,
     :enable_quoting,

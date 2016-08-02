@@ -32,6 +32,7 @@ class UserAnonymizer
       options.email_digests = false
       options.email_private_messages = false
       options.email_direct = false
+      options.email_for_own_posts = false
       options.save
 
       profile = @user.user_profile

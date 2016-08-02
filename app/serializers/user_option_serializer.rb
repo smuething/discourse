@@ -6,6 +6,7 @@ class UserOptionSerializer < ApplicationSerializer
              :email_digests,
              :email_private_messages,
              :email_direct,
+             :email_for_own_posts,
              :external_links_in_new_tab,
              :dynamic_favicon,
              :enable_quoting,

@@ -30,6 +30,7 @@ class UserOption < ActiveRecord::Base
     self.email_private_messages = SiteSetting.default_email_private_messages
     self.email_previous_replies = SiteSetting.default_email_previous_replies
     self.email_in_reply_to = SiteSetting.default_email_in_reply_to
+    self.email_for_own_posts = SiteSetting.default_email_for_own_posts
 
     self.enable_quoting = SiteSetting.default_other_enable_quoting
     self.external_links_in_new_tab = SiteSetting.default_other_external_links_in_new_tab
@@ -149,6 +150,7 @@ end
 #  like_notification_frequency   :integer          default(1), not null
 #  include_tl0_in_digests        :boolean          default(FALSE)
 #  mailing_list_mode_frequency   :integer          default(0), not null
+#  email_for_own_posts           :boolean          default(FALSE), not null
 #
 # Indexes
 #

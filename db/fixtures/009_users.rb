@@ -22,7 +22,8 @@ end
 
 UserOption.where(user_id: -1).update_all(
   email_private_messages: false,
-  email_direct: false
+  email_direct: false,
+  email_for_own_posts: false
 )
 
 Group.user_trust_level_change!(-1, TrustLevel[4])
@@ -81,6 +82,7 @@ if ENV["SMOKE"] == "1"
 
   UserOption.where(user_id: smoke_user.id).update_all(
     email_direct: false,
+    email_for_own_posts: false,
     email_digests: false,
     email_private_messages: false,
   )

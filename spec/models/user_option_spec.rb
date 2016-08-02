@@ -12,6 +12,7 @@ describe UserOption do
       user.reload
 
       expect(user.user_option.email_always).to eq(SiteSetting.default_email_always)
+      expect(user.user_option.email_for_own_posts).to eq(SiteSetting.default_email_for_own_posts)
     end
   end
 
