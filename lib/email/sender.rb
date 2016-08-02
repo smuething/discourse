@@ -87,7 +87,7 @@ module Email
         post_identifier = "<topic/#{topic_id}/#{post_id}@#{host}>"
 
         @message.header['Message-ID'] = post_identifier
-        @message.header['In-Reply-To'] = incoming_message_id || topic_identifier
+        @message.header['In-Reply-To'] = topic_identifier
         @message.header['References'] = topic_identifier
 
         topic = Topic.where(id: topic_id).first
