@@ -77,7 +77,7 @@ module Email
       body, @elided = select_body
       body ||= ""
 
-      raise NoBodyDetectedError if body.blank? && !@mail.has_attachments?
+      raise NoBodyDetectedError if body.blank? && attachments.empty?
 
       if is_auto_generated?
         @incoming_email.update_columns(is_auto_generated: true)
@@ -94,45 +94,19 @@ module Email
                      topic: post.topic,
                      skip_validations: user.staged?)
       else
-        destination = destinations.first
+        first_exception = nil
 
-        raise BadDestinationAddress if destination.blank?
-
-        case destination[:type]
-        when :group
-          group = destination[:obj]
-          create_topic(user: user,
-                       raw: body,
-                       title: subject,
-                       archetype: Archetype.private_message,
-                       target_group_names: [group.name],
-                       is_group_message: true,
-                       skip_validations: true)
-
-        when :category
-          category = destination[:obj]
-
-          raise StrangersNotAllowedError    if user.staged? && !category.email_in_allow_strangers
-          raise InsufficientTrustLevelError if !user.has_trust_level?(SiteSetting.email_in_min_trust)
-
-          create_topic(user: user,
-                       raw: body,
-                       title: subject,
-                       category: category.id,
-                       skip_validations: user.staged?)
-
-        when :reply
-          email_log = destination[:obj]
-
-          if email_log.user_id != user.id
-            raise ReplyUserNotMatchingError, "email_log.user_id => #{email_log.user_id.inspect}, user.id => #{user.id.inspect}"
+        destinations.each do |destination|
+          begin
+            process_destination(destination, user, body)
+          rescue => e
+            first_exception ||= e
+          else
+            return
           end
-
-          create_reply(user: user,
-                       raw: body,
-                       post: email_log.post,
-                       topic: email_log.post.topic)
         end
+
+        raise first_exception || BadDestinationAddress
       end
     end
 
@@ -340,6 +314,44 @@ module Email
       end
     end
 
+    def process_destination(destination, user, body)
+      case destination[:type]
+      when :group
+        group = destination[:obj]
+        create_topic(user: user,
+                     raw: body,
+                     title: subject,
+                     archetype: Archetype.private_message,
+                     target_group_names: [group.name],
+                     is_group_message: true,
+                     skip_validations: true)
+
+      when :category
+        category = destination[:obj]
+
+        raise StrangersNotAllowedError    if user.staged? && !category.email_in_allow_strangers
+        raise InsufficientTrustLevelError if !user.has_trust_level?(SiteSetting.email_in_min_trust)
+
+        create_topic(user: user,
+                     raw: body,
+                     title: subject,
+                     category: category.id,
+                     skip_validations: user.staged?)
+
+      when :reply
+        email_log = destination[:obj]
+
+        if email_log.user_id != user.id
+          raise ReplyUserNotMatchingError, "email_log.user_id => #{email_log.user_id.inspect}, user.id => #{user.id.inspect}"
+        end
+
+        create_reply(user: user,
+                     raw: body,
+                     post: email_log.post,
+                     topic: email_log.post.topic)
+      end
+    end
+
     def reply_by_email_address_regex
       @reply_by_email_address_regex ||= begin
         reply_addresses = [
@@ -424,12 +436,17 @@ module Email
       raise InvalidPostAction.new(e)
     end
 
+    def attachments
+      # strip blacklisted attachments (mostly signatures)
+      @attachments ||= @mail.attachments.select do |attachment|
+        attachment.content_type !~ SiteSetting.attachment_content_type_blacklist_regex &&
+        attachment.filename !~ SiteSetting.attachment_filename_blacklist_regex
+      end
+    end
+
     def create_post_with_attachments(options={})
       # deal with attachments
-      @mail.attachments.each do |attachment|
-        # always strip S/MIME signatures
-        next if attachment.content_type == "application/pkcs7-mime".freeze
-
+      attachments.each do |attachment|
         tmp = Tempfile.new("discourse-email-attachment")
         begin
           # read attachment
