@@ -103,6 +103,7 @@ module Jobs
         end
 
         if user.user_option.mailing_list_mode? &&
+           !user.staged && # staged users don't get mailing list emails
            user.user_option.mailing_list_mode_frequency == 1 && # don't catch notifications for users on daily mailing list mode
            (!post.try(:topic).try(:private_message?)) &&
            NOTIFICATIONS_SENT_BY_MAILING_LIST.include?(email_args[:notification_type])
